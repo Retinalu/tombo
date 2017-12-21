@@ -1,0 +1,340 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Modified Base Detection &mdash; Tombo 1.1.1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+
+  
+  
+    
+
+  
+
+  
+  
+    <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  
+
+  
+
+  
+        <link rel="index" title="Index"
+              href="genindex.html"/>
+        <link rel="search" title="Search" href="search.html"/>
+    <link rel="top" title="Tombo 1.1.1 documentation" href="index.html"/>
+        <link rel="next" title="Text Outputs" href="text_output.html"/>
+        <link rel="prev" title="Re-squiggle Algorithm" href="resquiggle.html"/> 
+
+  
+  <script src="_static/js/modernizr.min.js"></script>
+
+</head>
+
+<body class="wy-body-for-nav" role="document">
+
+   
+  <div class="wy-grid-for-nav">
+
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search">
+          
+
+          
+            <a href="index.html" class="icon icon-home"> Tombo
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                1.1.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="examples.html">Tombo Examples</a></li>
+<li class="toctree-l1"><a class="reference internal" href="resquiggle.html">Re-squiggle Algorithm</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Modified Base Detection</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#statistical-testing">Statistical Testing</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#mc-dna-detection">5mC (DNA) Detection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#canonical-sample-comparison-detection">Canonical Sample Comparison Detection</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#de-novo-non-canonical-base-detection">De novo Non-canonical Base Detection</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#multi-processing">Multi-processing</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#tombo-statistics-file-format">Tombo Statistics File Format</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="text_output.html">Text Outputs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="plotting.html">Plotting Commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="filtering.html">Read Filtering Commands</a></li>
+<li class="toctree-l1"><a class="reference internal" href="model_training.html">Model Training (Advanced Users Only)</a></li>
+</ul>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="tombo.html">tombo package</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" role="navigation" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">Tombo</a>
+        
+      </nav>
+
+
+      
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Modified Base Detection</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/modified_base_detection.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="modified-base-detection">
+<h1>Modified Base Detection<a class="headerlink" href="#modified-base-detection" title="Permalink to this headline">¶</a></h1>
+<p>Tombo enables three methods for detecting shifts in current signal level, indicative of non-canonical bases. These three methods allow researchers to investigate non-canonical bases given any sample type, while also enabling more accurate detection of specific known modifications (currently only 5-methyl cytosine, but more coming soon).</p>
+<hr class="docutils" />
+<div class="figure align-center" id="id2">
+<a class="reference internal image-reference" href="_images/testing_method_comparison.png"><img alt="_images/testing_method_comparison.png" src="_images/testing_method_comparison.png" style="width: 975.0px; height: 546.0px;" /></a>
+<p class="caption"><span class="caption-text">Tombo modified base testing methods.</span></p>
+</div>
+<hr class="docutils" />
+<p>All three methods are accessed by the <code class="docutils literal"><span class="pre">test_significance</span></code> tombo subcommand as described below.</p>
+<p>TL;DR:</p>
+<ul class="simple">
+<li>To identify 5-methyl cytosine (5mC) run <code class="docutils literal"><span class="pre">test_significance</span></code> with the <code class="docutils literal"><span class="pre">--alternate-bases</span> <span class="pre">5mC</span></code> option</li>
+<li>For more experimental de novo modified base detection simply run <code class="docutils literal"><span class="pre">test_significance</span></code> with a set of reads</li>
+<li>For modified base detection via comparison to a control sample (e.g. PCR) run <code class="docutils literal"><span class="pre">test_significance</span></code> with a control set of reads (<code class="docutils literal"><span class="pre">--control-fast5-basedirs</span></code>)</li>
+<li>The <code class="docutils literal"><span class="pre">test_significance</span></code> command will produce a binary file (not intended for direct use)
+- To extract useful text files use the <code class="docutils literal"><span class="pre">write_wiggles</span></code> command
+- To visualize raw signal around significant regions use the <code class="docutils literal"><span class="pre">plot_most_significant</span></code> command</li>
+</ul>
+<blockquote>
+<div>Note that the <code class="docutils literal"><span class="pre">resquiggle</span></code> command must be run on a set of reads before processing with <code class="docutils literal"><span class="pre">test_significance</span></code>.</div></blockquote>
+<div class="section" id="statistical-testing">
+<h2>Statistical Testing<a class="headerlink" href="#statistical-testing" title="Permalink to this headline">¶</a></h2>
+<p>For all statistical testing methods, the result is a binary Tombo statistics file. This file contains statistics associated with each genomic base (per-read output is not currently supported, but may be in the future). This file is not intended for direct use, but several other Tombo commands (<code class="docutils literal"><span class="pre">write_wiggles</span></code>, <code class="docutils literal"><span class="pre">write_most_significant_fasta</span></code>, <code class="docutils literal"><span class="pre">plot_most_significant</span></code>, etc.) take the statistics file as an input, accomodating many user pipelines downstream of modified base detection.</p>
+<p>Of particular interest, the statistics file contains the fraction of reads at each genomic position passing a set threshold (<code class="docutils literal"><span class="pre">--single-read-threshold</span></code>). This value is set to a default of 1% p-value for hypothesis testing methods (de novo and control sample comparison) and a log likelihood ratio of 2 for the alternative model testing method. Note that for likelihood ratio test fractions, some reads will fall between the +/- threshold values and so the sum of <code class="docutils literal"><span class="pre">frac</span></code> and <code class="docutils literal"><span class="pre">alt_frac</span></code> may not be 1.</p>
+<p>For the de novo and alternative model testing approaches a default canonical model is used (included with Tombo code base). Users may also train their own canonical Tombo model (possibly for an older chemistry version) and test agaist this model using the <code class="docutils literal"><span class="pre">--tombo-model-filename</span></code> option. See more in the Model Training documentation section.</p>
+<div class="section" id="mc-dna-detection">
+<h3>5mC (DNA) Detection<a class="headerlink" href="#mc-dna-detection" title="Permalink to this headline">¶</a></h3>
+<p>In order to specifically detect 5-methyl cytosine (as well as other alternative bases soon), use the <code class="docutils literal"><span class="pre">test_significance</span></code> command with the <code class="docutils literal"><span class="pre">--alternate-bases</span></code> option. Users may also train their own alternative base Tombo models and test against these with the <code class="docutils literal"><span class="pre">--alternate-model-filenames</span></code> option. See more details in the Model Training documentation section.</p>
+<p>This will perform a log likelihood ratio test using the default canonical and 5mC alternative models provided with Tombo. This likelihood ratio is computed over all positions modeled. The default model is a 6-mer, so the signal at the 6 surrounding genomic contexts, contribute to the log likelihood ratio test statistic at any one position.</p>
+<p>For example with a <strong>C</strong> found in a TGGTA <strong>C</strong> GTCCG context, the signal will be tested against expected canonical and alternative distributions at the following locations:</p>
+<div class="highlight-default"><div class="highlight"><pre><span></span><span class="n">TGGTA</span> <span class="o">**</span><span class="n">C</span><span class="o">**</span> <span class="n">GTCCG</span>
+<span class="o">-----------------</span>
+<span class="n">TGGTA</span> <span class="o">**</span><span class="n">C</span><span class="o">**</span>
+ <span class="n">GGTA</span> <span class="o">**</span><span class="n">C</span><span class="o">**</span> <span class="n">G</span>
+  <span class="n">GTA</span> <span class="o">**</span><span class="n">C</span><span class="o">**</span> <span class="n">GT</span>
+   <span class="n">TA</span> <span class="o">**</span><span class="n">C</span><span class="o">**</span> <span class="n">GTC</span>
+    <span class="n">A</span> <span class="o">**</span><span class="n">C</span><span class="o">**</span> <span class="n">GTCC</span>
+      <span class="o">**</span><span class="n">C</span><span class="o">**</span> <span class="n">GTCCG</span>
+</pre></div>
+</div>
+<p>New alternative base models will be added as they are trained. This is the perferred method for modified base detection if a model is available for your biological sample of interest.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>tombo test_significance --fast5-basedirs &lt;fast5s-base-directory&gt; <span class="se">\</span>
+    --alternate-bases 5mC --statistics-file-basename sample_5mC_detection
+
+<span class="c1"># if you have trained you own alternative base model</span>
+tombo test_significance --fast5-basedirs &lt;fast5s-base-directory&gt; <span class="se">\</span>
+    --alternate-model-filename exotic_base.tombo.model <span class="se">\</span>
+    --statistics-file-basename sample_exotic_base_detection
+</pre></div>
+</div>
+</div>
+<div class="section" id="canonical-sample-comparison-detection">
+<h3>Canonical Sample Comparison Detection<a class="headerlink" href="#canonical-sample-comparison-detection" title="Permalink to this headline">¶</a></h3>
+<p>In order to perform <em>canonical sample comparison</em> modified base detection, use the <code class="docutils literal"><span class="pre">test_significance</span></code> command with a second set of reads from the same biological sample containing only canonical bases (e.g. PCR) via the <code class="docutils literal"><span class="pre">--control-fast5-basedirs</span></code>.</p>
+<p>For each sample read, this will perform a hypothesis test against a normal distribution estimated from the the signal level observed from the control sample at each genomic position. This method provides the highest accuracy (as effects outside of the default modeled 6-mer are accounted for in the control sample), but does not always identify the exact modification position or the identity of the modified base.</p>
+<p>Note that no global model is used in the application of this method. Instead the testing null distribution is estimated at each genomic location.</p>
+<p>For both this method, as well as the canonical model method, the <code class="docutils literal"><span class="pre">--fishers-method-context</span></code> option will combine test values, using <a class="reference external" href="https://en.wikipedia.org/wiki/Fisher%27s_method">Fisher’s Method</a>, over a moving window extending a number of positions in either direction. Due to the nature of nanopore sequencing, the genomic context surrounding the read head effect that current at any position. Thus shifts in signal due to a modified base may occur at several positions to either side of the true modified location. Thus combining statistical test values across several genomic positions can help to center significant values on the truely modified position. The default value for this parameter is 1, but reasonable results can be obtained for values between 0 and 3.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>tombo test_significance --fast5-basedirs &lt;fast5s-base-directory&gt; <span class="se">\</span>
+    --control-fast5-basedirs &lt;control-fast5s-base-directory&gt; <span class="se">\</span>
+    --statistics-file-basename sample_canonical_compare
+</pre></div>
+</div>
+</div>
+<div class="section" id="de-novo-non-canonical-base-detection">
+<h3>De novo Non-canonical Base Detection<a class="headerlink" href="#de-novo-non-canonical-base-detection" title="Permalink to this headline">¶</a></h3>
+<p>In order to perform de novo non-canonical base detection, use the <code class="docutils literal"><span class="pre">test_significance</span></code> command with no other options (or a canonical Tombo model, <code class="docutils literal"><span class="pre">--tombo-model-filename</span></code>, if not using the default canonical Tombo model).</p>
+<p>For each read, this will perform a hypothesis test against the canonical model based on the genomic sequence at each position. Note that this method can be quite error prone and will likely result in a high number of false positives, but may be of use in a research and development setting. This method also has the least requirements of the three methods, requiring only a set of reads and a genome, allowing any nanopore researcher to start investigating modified bases.</p>
+<div class="highlight-bash"><div class="highlight"><pre><span></span>tombo test_significance --fast5-basedirs &lt;fast5s-base-directory&gt; <span class="se">\</span>
+    --statistics-file-basename sample_de_novo_detection
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="multi-processing">
+<h2>Multi-processing<a class="headerlink" href="#multi-processing" title="Permalink to this headline">¶</a></h2>
+<p>Tombo statistical testing provides the option to perform testing spread acorss multiple processes. This also allows users to limit the memory requirement for processing statistical testing, as all events for all reads covering a region must be read into memory at once to perform testing. If the <code class="docutils literal"><span class="pre">test_significance</span></code> command seems to be using too much memory, consider setting the <code class="docutils literal"><span class="pre">--multiprocess-region-size</span></code> to a lower value.</p>
+<p>Multi-processing is performed over batches delineated by regular intervals across chromosomes covered by at least one read. The interval size is determined by the <code class="docutils literal"><span class="pre">--multiprocess-region-size</span></code> option and processed by <code class="docutils literal"><span class="pre">--processes</span></code> individual processes independently. The produced per-base results are identical no matter the multi=processing options selected.</p>
+</div>
+<div class="section" id="tombo-statistics-file-format">
+<h2>Tombo Statistics File Format<a class="headerlink" href="#tombo-statistics-file-format" title="Permalink to this headline">¶</a></h2>
+<p>While the Tombo statistics file is meant to be a binary file not processed by outside tools its contents are described here. The Tombo statistics file is in the HDF5 format. There is one attribute at the root level, <code class="docutils literal"><span class="pre">stat_type</span></code> indicating which testing method was used (<code class="docutils literal"><span class="pre">model_compare</span></code>, <code class="docutils literal"><span class="pre">de_novo</span></code> or <code class="docutils literal"><span class="pre">sample_compare</span></code>).</p>
+<p>The per-base statistics are stored in a dataset, <code class="docutils literal"><span class="pre">stats</span></code>, containing one record for each genomic base. Each record contains the following attributes: <code class="docutils literal"><span class="pre">stat</span></code>, <code class="docutils literal"><span class="pre">mt_stat</span></code>, <code class="docutils literal"><span class="pre">frac</span></code>, <code class="docutils literal"><span class="pre">alt_frac</span></code>, <code class="docutils literal"><span class="pre">pos</span></code>, <code class="docutils literal"><span class="pre">chrm</span></code>, <code class="docutils literal"><span class="pre">strand</span></code>, <code class="docutils literal"><span class="pre">cov</span></code> and <code class="docutils literal"><span class="pre">control_cov</span></code>.</p>
+<p><code class="docutils literal"><span class="pre">pos</span></code>, <code class="docutils literal"><span class="pre">chrm</span></code> and <code class="docutils literal"><span class="pre">strand</span></code> define the genomic position for this record. Note that position is 0-based indexing, and care should be taken if using this to compare to other genomic data sets.</p>
+<p><code class="docutils literal"><span class="pre">frac</span></code> and <code class="docutils literal"><span class="pre">alt_frac</span></code> contain the fraction of reads at this genomic position producing a significant result as defined by <code class="docutils literal"><span class="pre">--single-read-threshold</span></code>. Note that for log likelihood test results, via the alternative model comparison method, the sum of <code class="docutils literal"><span class="pre">frac</span></code> and <code class="docutils literal"><span class="pre">alt_frac</span></code> may not sum to 1.</p>
+<p><code class="docutils literal"><span class="pre">cov</span></code> and <code class="docutils literal"><span class="pre">control_cov</span></code> contain the read coverage at the genomic position for the sample and control reads (control coverage is only applicable for the control sample comparison testing method).</p>
+<p><code class="docutils literal"><span class="pre">stat</span></code> and <code class="docutils literal"><span class="pre">mt_stat</span></code> contain the “averaged” statistical testing values at each genomic location. <code class="docutils literal"><span class="pre">mt_stat</span></code> contains the <a class="reference external" href="https://en.wikipedia.org/wiki/False_discovery_rate#Benjamini%E2%80%93Hochberg_procedure">Benjamini-Hochberg</a> multiple testing corrected testing value. For the hypothesis testing based methods (de novo and control sample comparison) this “average” is taken as the <a class="reference external" href="https://en.wikipedia.org/wiki/Fisher%27s_method">Fisher’s method</a> combination of p-values for each read at this genomic position. Note that this is highly dependent on read coverage and thus should be used with caution. For the alternative model comparison method, the “average” is taken as the average log likelihood test statistics over all reads covering this genomic position.</p>
+</div>
+</div>
+
+
+           </div>
+           <div class="articleComments">
+            
+           </div>
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="text_output.html" class="btn btn-neutral float-right" title="Text Outputs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="resquiggle.html" class="btn btn-neutral" title="Re-squiggle Algorithm" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2017, Oxford Nanopore Technologies.
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/snide/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  
+
+    <script type="text/javascript">
+        var DOCUMENTATION_OPTIONS = {
+            URL_ROOT:'./',
+            VERSION:'1.1.1',
+            COLLAPSE_INDEX:false,
+            FILE_SUFFIX:'.html',
+            HAS_SOURCE:  true,
+            SOURCELINK_SUFFIX: '.txt'
+        };
+    </script>
+      <script type="text/javascript" src="_static/jquery.js"></script>
+      <script type="text/javascript" src="_static/underscore.js"></script>
+      <script type="text/javascript" src="_static/doctools.js"></script>
+      <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+
+  
+
+  
+  
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+  
+
+  
+  
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.StickyNav.enable();
+      });
+  </script>
+   
+
+</body>
+</html>
